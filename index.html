@@ -2,12 +2,10 @@
 <!doctype html>
 <html lang="ko">
 <head>
- <link rel="icon" type="image/png" href="./icon.png">
-<link rel="apple-touch-icon" href="./icon.png">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#e9f4ed">
-<title>우리 집 식재료 보관함</title>
+<title>우리 집 재고관리</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#f5f7f4;color:#24352c;font-family:system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif}
@@ -16,7 +14,7 @@ header{margin-bottom:24px}
 h1{font-size:clamp(26px,4vw,38px);margin:0 0 7px}
 header p{color:#718178;margin:0}
 .place{border:1px solid #e1e9e1;background:white;border-radius:18px;margin-bottom:16px;overflow:hidden;box-shadow:0 5px 22px #28462a0b}
-.place-head{display:flex;align-items:center;gap:10px;background:#eaf3ec;padding:15px 18px}
+.main-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.main-heading h1{margin:0 0 7px}.add-place{background:#287a50;color:white;border:0;border-radius:11px;padding:10px 13px;font-size:14px;font-weight:750;white-space:nowrap}.place-head{display:flex;align-items:center;gap:10px;background:#eaf3ec;padding:15px 18px}
 /* 보관 장소별 구분 색상: 기존 기능과 데이터는 변경하지 않음 */
 .place:nth-child(1) .place-head{background:#dceeff}
 .place:nth-child(1) .place-toggle{color:#245b8a}
@@ -30,8 +28,13 @@ header p{color:#718178;margin:0}
 .place:nth-child(4) .place-head{background:#f1e4fa}
 .place:nth-child(4) .place-toggle{color:#75458d}
 .place:nth-child(4) .place-head>.add{background:#9160a7;color:#fff}
+.place:nth-child(5n) .place-head{background:#fce8e5}.place:nth-child(5n) .place-toggle{color:#994b42}.place:nth-child(5n) .place-head>.add{background:#b96961;color:white}
+.place:nth-child(5n + 1):not(:first-child) .place-head{background:#e5edff}.place:nth-child(5n + 1):not(:first-child) .place-toggle{color:#4a62a0}
+.place:nth-child(5n + 2):not(:nth-child(2)) .place-head{background:#e8f5e8}.place:nth-child(5n + 2):not(:nth-child(2)) .place-toggle{color:#34744e}
+.place:nth-child(5n + 3):not(:nth-child(3)) .place-head{background:#fff0dc}.place:nth-child(5n + 3):not(:nth-child(3)) .place-toggle{color:#926329}
+.place:nth-child(5n + 4):not(:nth-child(4)) .place-head{background:#f1e4fa}.place:nth-child(5n + 4):not(:nth-child(4)) .place-toggle{color:#75458d}
 
-.place-toggle{border:0;background:transparent;display:flex;align-items:center;gap:5px;flex:1;text-align:left;color:#244a34;font-size:19px;font-weight:800;cursor:pointer;padding:4px 0}
+.place-emoji{margin-right:3px}.remove-place{border:0;background:transparent;color:#a35a5a;font-size:22px;width:30px;height:34px;flex:none}.place-toggle{border:0;background:transparent;display:flex;align-items:center;gap:5px;flex:1;text-align:left;color:#244a34;font-size:19px;font-weight:800;cursor:pointer;padding:4px 0}
 .chev{font-size:13px;transition:transform .2s}
 .collapsed .chev{transform:rotate(-90deg)}
 button{font:inherit;cursor:pointer}
@@ -89,8 +92,8 @@ main{padding:22px 12px 50px}
 <body>
 <main>
 <header>
-<h1>🥬 우리 집 식재료 보관함</h1>
-<p>우리 집 식재료를 한눈에 확인하세요.</p>
+<div class="main-heading"><h1>🏠 우리 집 재고관리</h1><button type="button" id="add-place" class="add-place">＋ 보관함 추가</button></div>
+<p>우리 집 식재료와 생활용품을 한눈에 확인하세요.</p>
 </header>
 <div id="app"></div>
 <p class="hint">식재료는 이 브라우저에 자동 저장됩니다. 다른 기기와 자동으로 공유되지 않으며 브라우저 데이터를 삭제하면 사라질 수 있습니다.</p>
@@ -115,19 +118,21 @@ main{padding:22px 12px 50px}
 <script>
 (()=>{'use strict';
 const KEY='our-home-fridge-v1',places=['냉동실','냉장실','신선실','실온 보관'];
+ const placeIcon=name=>({냉동실:'❄️',냉장실:'🥛',신선실:'🥬','실온 보관':'🏠'})[name]||'';
 const emojiMap={돼지고기:'🐷',삼겹살:'🥓',목살:'🐷',양고기:'🐑',소고기:'🐮',쇠고기:'🐮',닭:'🐔',닭고기:'🐔',닭가슴살:'🐔',오리고기:'🦆',고기:'🥩',생선:'🐟',고등어:'🐟',연어:'🐟',참치:'🐟',새우:'🦐',오징어:'🦑',게:'🦀',조개:'🐚',사과:'🍎',바나나:'🍌',딸기:'🍓',포도:'🍇',귤:'🍊',오렌지:'🍊',레몬:'🍋',수박:'🍉',복숭아:'🍑',배:'🍐',키위:'🥝',파인애플:'🍍',블루베리:'🫐',토마토:'🍅',파프리카:'🫑',피망:'🫑',감자:'🥔',고구마:'🍠',양파:'🧅',마늘:'🧄',당근:'🥕',오이:'🥒',상추:'🥬',배추:'🥬',양배추:'🥬',브로콜리:'🥦',버섯:'🍄',가지:'🍆',고추:'🌶️',옥수수:'🌽',파:'🧅',대파:'🧅',달걀:'🥚',계란:'🥚',우유:'🥛',치즈:'🧀',버터:'🧈',요거트:'🥛',두부:'⬜',김치:'🥬',밥:'🍚',쌀:'🍚',빵:'🍞',식빵:'🍞',라면:'🍜',국수:'🍜',파스타:'🍝',떡:'🍡',만두:'🥟',피자:'🍕',햄:'🍖',소시지:'🌭',베이컨:'🥓',밀키트:'🍲',아이스크림:'🍨',초콜릿:'🍫',커피:'☕',물:'💧',주스:'🧃',꿀:'🍯',소금:'🧂',설탕:'🍬',식용유:'🫒',올리브유:'🫒',견과류:'🥜',땅콩:'🥜'};
 const icon=name=>{const n=name.trim().replace(/\s+/g,'');if(n.includes('라면'))return '';if(emojiMap[n])return emojiMap[n];const match=Object.keys(emojiMap).filter(k=>n.includes(k)).sort((a,b)=>b.length-a.length)[0];return match?emojiMap[match]:''};
 const id=()=>String(Date.now())+'-'+Math.random().toString(36).slice(2);
 const blank=()=>places.map(name=>({id:id(),name,open:true,categories:[]}));
-let data;try{const saved=JSON.parse(localStorage.getItem(KEY));data=Array.isArray(saved)&&saved.length===4&&saved.every((p,i)=>(p.name===places[i]||(i===0&&p.name==='냉장고'))&&Array.isArray(p.categories))?saved:blank();if(data[0].name==='냉장고')data[0].name='냉동실'}catch{data=blank()}
-const app=document.getElementById('app'),dialog=document.getElementById('editor'),form=document.getElementById('editor-form'),nameInput=document.getElementById('name'),amountInput=document.getElementById('amount'),qtyWrap=document.getElementById('qty-wrap'),preview=document.getElementById('preview'),imageTools=document.getElementById('image-tools'),imageFile=document.getElementById('image-file');let edit=null,pendingImage=null;
+let data;try{const saved=JSON.parse(localStorage.getItem(KEY));data=Array.isArray(saved)&&saved.length>=4&&saved.slice(0,4).every((p,i)=>(p.name===places[i]||(i===0&&p.name==='냉장고'))&&Array.isArray(p.categories))&&saved.every(p=>p&&typeof p.name==='string'&&Array.isArray(p.categories))?saved:blank();if(data[0].name==='냉장고')data[0].name='냉동실'}catch{data=blank()}
+document.getElementById('add-place').addEventListener('click',()=>{const entered=prompt('새 보관함 이름을 입력해 주세요. (예: 약 보관함)');if(entered===null)return;const name=entered.trim();if(!name){alert('보관함 이름을 입력해 주세요.');return}if(name.length>40){alert('보관함 이름은 40자 이내로 입력해 주세요.');return}if(data.some(p=>p.name===name)){alert('이미 같은 이름의 보관함이 있습니다.');return}data.push({id:id(),name,open:true,categories:[]});save();render()});
+ const app=document.getElementById('app'),dialog=document.getElementById('editor'),form=document.getElementById('editor-form'),nameInput=document.getElementById('name'),amountInput=document.getElementById('amount'),qtyWrap=document.getElementById('qty-wrap'),preview=document.getElementById('preview'),imageTools=document.getElementById('image-tools'),imageFile=document.getElementById('image-file');let edit=null,pendingImage=null;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch{alert('브라우저 저장 공간에 저장하지 못했습니다. 저장 공간을 확인해 주세요.')}}
 function el(tag,cls,text){const node=document.createElement(tag);if(cls)node.className=cls;if(text!==undefined)node.textContent=text;return node}
 function button(cls,text,title,action){const b=el('button',cls,text);b.type='button';b.title=title;b.setAttribute('aria-label',title);b.addEventListener('click',action);return b}
  function foodVisual(food){const wrap=el('span','emoji');if(food.image){const img=el('img','food-photo');img.src=food.image;img.alt=food.name+' 사진';wrap.append(img)}else{wrap.textContent=icon(food.name)}return wrap}
  function searchFoodImage(food,place,cat,direct){openEditor(direct?'edit-direct-food':'edit-food',place,cat,food);const url='https://www.google.com/search?tbm=isch&q='+encodeURIComponent(food.name);const tab=window.open(url,'_blank');if(!tab){alert('구글 검색창이 차단되었습니다. 수정창의 구글 이미지 검색 버튼을 눌러 주세요.')}}
  function foodCard(food,place,cat,direct){const card=el('div','food');card.append(button('remove-food','×',food.name+' 삭제',()=>{if(direct)place.directFoods=place.directFoods.filter(f=>f.id!==food.id);else cat.foods=cat.foods.filter(f=>f.id!==food.id);save();render()}));card.append(foodVisual(food),button('food-name food-name-button',food.name,food.name+' 정보 및 이미지 수정',()=>searchFoodImage(food,place,cat,direct)),button('qty',food.quantity+'개',food.name+' 수량 변경',()=>openEditor(direct?'direct-quantity':'quantity',place,cat,food)));return card}
- function render(){app.replaceChildren();data.forEach(place=>{const section=el('section','place'+(place.open?'':' collapsed'));const head=el('div','place-head');const toggle=button('place-toggle','',place.name+' 펼치기 또는 접기',()=>{place.open=!place.open;save();render()});toggle.setAttribute('aria-expanded',String(place.open));toggle.append(el('span','',place.name),el('span','chev','▼'));head.append(toggle,button('add','+',place.name+'에 분류 추가',()=>openEditor('category',place)));section.append(head);const body=el('div','place-body');if(!place.categories.length&&place.name!=='실온 보관')body.append(el('div','place-empty','분류가 없습니다. + 버튼을 눌러 추가해 보세요.'));if(place.name==='실온 보관'){const directBox=el('div','category'),directHead=el('div','direct-head');directHead.append(el('h2','','바로 보관한 식재료'),button('add','+','실온 보관에 식재료 바로 추가',()=>openEditor('direct-food',place)));directBox.append(directHead);if(!Array.isArray(place.directFoods))place.directFoods=[];if(!place.directFoods.length)directBox.append(el('div','empty','분류 없이 보관할 식재료를 + 버튼으로 추가해 보세요.'));const directCards=el('div','cards');place.directFoods.forEach(food=>directCards.append(foodCard(food,place,null,true)));directBox.append(directCards);body.append(directBox)}place.categories.forEach(cat=>{const box=el('div','category'),catHead=el('div','cat-head');catHead.append(el('h2','',cat.name),button('add','+',cat.name+'에 식재료 추가',()=>openEditor('food',place,cat)),button('remove-cat','×',cat.name+' 분류 삭제',()=>{if(confirm('“'+cat.name+'” 분류와 안에 있는 식재료를 모두 삭제할까요?')){place.categories=place.categories.filter(c=>c.id!==cat.id);save();render()}}));box.append(catHead);if(!cat.foods.length)box.append(el('div','empty','등록된 식재료가 없습니다.'));const cards=el('div','cards');cat.foods.forEach(food=>cards.append(foodCard(food,place,cat,false)));box.append(cards);body.append(box)});section.append(body);app.append(section)})}
+ function render(){app.replaceChildren();data.forEach(place=>{const section=el('section','place'+(place.open?'':' collapsed'));const head=el('div','place-head');const toggle=button('place-toggle','',place.name+' 펼치기 또는 접기',()=>{place.open=!place.open;save();render()});toggle.setAttribute('aria-expanded',String(place.open));if(placeIcon(place.name))toggle.append(el('span','place-emoji',placeIcon(place.name)));toggle.append(el('span','',place.name),el('span','chev','▼'));head.append(toggle,button('add','+',place.name+'에 분류 추가',()=>openEditor('category',place)));if(!places.includes(place.name)){head.append(button('remove-place','×',place.name+' 보관함 삭제',()=>{if(confirm('“'+place.name+'” 보관함과 안의 모든 분류·물품을 삭제할까요?')){data=data.filter(p=>p.id!==place.id);save();render()}}))}section.append(head);const body=el('div','place-body');if(!place.categories.length&&place.name!=='실온 보관')body.append(el('div','place-empty','분류가 없습니다. + 버튼을 눌러 추가해 보세요.'));if(place.name==='실온 보관'){const directBox=el('div','category'),directHead=el('div','direct-head');directHead.append(el('h2','','바로 보관한 식재료'),button('add','+','실온 보관에 식재료 바로 추가',()=>openEditor('direct-food',place)));directBox.append(directHead);if(!Array.isArray(place.directFoods))place.directFoods=[];if(!place.directFoods.length)directBox.append(el('div','empty','분류 없이 보관할 식재료를 + 버튼으로 추가해 보세요.'));const directCards=el('div','cards');place.directFoods.forEach(food=>directCards.append(foodCard(food,place,null,true)));directBox.append(directCards);body.append(directBox)}place.categories.forEach(cat=>{const box=el('div','category'),catHead=el('div','cat-head');catHead.append(el('h2','',cat.name),button('add','+',cat.name+'에 식재료 추가',()=>openEditor('food',place,cat)),button('remove-cat','×',cat.name+' 분류 삭제',()=>{if(confirm('“'+cat.name+'” 분류와 안에 있는 식재료를 모두 삭제할까요?')){place.categories=place.categories.filter(c=>c.id!==cat.id);save();render()}}));box.append(catHead);if(!cat.foods.length)box.append(el('div','empty','등록된 식재료가 없습니다.'));const cards=el('div','cards');cat.foods.forEach(food=>cards.append(foodCard(food,place,cat,false)));box.append(cards);body.append(box)});section.append(body);app.append(section)})}
  function openEditor(type,place,cat,food){edit={type,place,cat,food};form.reset();pendingImage=food?.image||null;const isQty=type==='quantity'||type==='direct-quantity',isCat=type==='category',isEdit=type==='edit-food'||type==='edit-direct-food';qtyWrap.hidden=isCat;nameInput.readOnly=isQty;document.getElementById('editor-title').textContent=isCat?'분류 추가':isQty?'수량 변경':isEdit?'식재료 수정':'식재료 추가';nameInput.value=food?.name||'';amountInput.value=food?.quantity??'1';document.querySelector('label[for="name"]').hidden=isQty;nameInput.hidden=isQty;preview.hidden=isCat||isQty;imageTools.hidden=isCat||isQty;updatePreview();dialog.showModal();(isQty?amountInput:nameInput).focus()}
  function updatePreview(){if(preview.hidden)return;preview.replaceChildren();if(pendingImage){const img=el('img','preview-photo');img.src=pendingImage;img.alt='선택한 사진';preview.append(img,document.createTextNode(' 선택한 사진'))}else{preview.textContent=icon(nameInput.value)?'자동 이모지: '+icon(nameInput.value):'해당하는 이모지가 없어 이름만 표시됩니다.'}}
  nameInput.addEventListener('input',updatePreview);
